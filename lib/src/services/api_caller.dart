@@ -47,6 +47,48 @@ class ApiCaller {
 
   // TRANSACTIONS
 
+  static Future<bool> deleteTransaction(String id) async {
+    Uri url = Uri.parse(ApiRoutes.delete);
+
+    try {
+      final response = await http.post(
+        url,
+        headers: _buildHeader("Transactions"),
+        body: {"sql": "transactionId=eq.$id"},
+      );
+
+      debugPrint('DELETE TRANSACTION: ${response.body}');
+
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint('DELETE TRANSACTIONS ERROR: ${e.toString()}');
+      return false;
+    }
+  }
+
+  static Future<bool> editTransaction(
+      Map<String, dynamic> req, String id) async {
+    Uri url = Uri.parse(ApiRoutes.update);
+
+    Map<String, String> headers = _buildHeader("Transactions");
+    headers['searchParameter'] = 'transactionId=eq.$id';
+
+    try {
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: jsonEncode(req),
+      );
+
+      debugPrint('UPDATE TRANSACTION: ${response.body}');
+
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint('UPDATE TRANSACTIONS ERROR: ${e.toString()}');
+      return false;
+    }
+  }
+
   static Future<bool> createTransaction(Map<String, dynamic> req) async {
     Uri url = Uri.parse(ApiRoutes.insert);
 

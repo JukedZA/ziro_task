@@ -7,6 +7,7 @@ import 'package:transaction_management_app/src/core/theme/colors.dart';
 import 'package:transaction_management_app/src/core/theme/text_styles.dart';
 import 'package:transaction_management_app/src/core/utils/extensions.dart';
 import 'package:transaction_management_app/src/core/utils/formatters.dart';
+import 'package:transaction_management_app/src/models/transaction/transaction_model.dart';
 import 'package:transaction_management_app/src/models/user/user_model.dart';
 import 'package:transaction_management_app/src/stores/transaction_store.dart';
 
@@ -26,6 +27,11 @@ class CreateTransactionBody extends StatefulWidget {
 class _CreateTransactionBodyState extends State<CreateTransactionBody> {
   late TransactionStore _store;
 
+  // NULL TO CREATE A NEW TASK || NOT NULL TO EDIT A TASK
+  TransactionModel? _selectedTransaction;
+
+  bool _isEditing = false;
+
   final FocusNode _amountNode = FocusNode();
   final FocusNode _dateNode = FocusNode();
 
@@ -39,7 +45,7 @@ class _CreateTransactionBodyState extends State<CreateTransactionBody> {
     'Incoming',
   ];
 
-  Future<bool> _createTransaction() async {
+  Future<bool> _editOrCreateTransaction() async {
     if (_amountController.text.trim().isEmpty ||
         _store.selectedDate == null ||
         _store.selectedTransactionType == null ||
@@ -55,7 +61,11 @@ class _CreateTransactionBodyState extends State<CreateTransactionBody> {
       "category": '',
     };
 
-    return await _store.createTransaction(req);
+    if (_isEditing) {
+      return await _store.editTransaction(req);
+    } else {
+      return await _store.createTransaction(req);
+    }
   }
 
   @override
@@ -63,6 +73,22 @@ class _CreateTransactionBodyState extends State<CreateTransactionBody> {
     super.initState();
 
     _store = widget.store;
+
+    _selectedTransaction = _store.selectedTransaction;
+
+    if (_selectedTransaction != null) {
+      _initEditMode();
+    }
+  }
+
+  void _initEditMode() {
+    _isEditing = true;
+
+    _amountController.text = _selectedTransaction!.amount;
+    _dateController.text = _selectedTransaction!.date;
+
+    _store.selectedDate = DateTime.parse(_selectedTransaction!.date);
+    _store.selectedTransactionType = _selectedTransaction!.transactionType;
   }
 
   void _hideKeyboard(context) =>
@@ -152,20 +178,22 @@ class _CreateTransactionBodyState extends State<CreateTransactionBody> {
             ),
             WideTextButton(
               onTap: () async {
-                bool success = await _createTransaction();
+                bool success;
+
+                success = await _editOrCreateTransaction();
 
                 if (success && context.mounted) {
                   Navigator.of(context).pop();
                 }
               },
-              text: 'Create Transaction',
+              text: _isEditing ? 'Confirm Edit' : 'Create Transaction',
               backgroundColor:
                   _store.isLoading ? ThemeColors.containerOnBackground : null,
               isLoading: _store.isLoading,
             ),
           ],
         ).onTap(() {
-          _amountNode.unfocus();
+          _hideKeyboard(context);
         }),
       );
     });

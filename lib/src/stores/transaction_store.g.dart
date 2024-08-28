@@ -72,6 +72,22 @@ mixin _$TransactionStore on TransactionStoreBase, Store {
     });
   }
 
+  late final _$selectedTransactionAtom =
+      Atom(name: 'TransactionStoreBase.selectedTransaction', context: context);
+
+  @override
+  TransactionModel? get selectedTransaction {
+    _$selectedTransactionAtom.reportRead();
+    return super.selectedTransaction;
+  }
+
+  @override
+  set selectedTransaction(TransactionModel? value) {
+    _$selectedTransactionAtom.reportWrite(value, super.selectedTransaction, () {
+      super.selectedTransaction = value;
+    });
+  }
+
   late final _$selectedDateAtom =
       Atom(name: 'TransactionStoreBase.selectedDate', context: context);
 
@@ -169,6 +185,7 @@ mixin _$TransactionStore on TransactionStoreBase, Store {
 graphState: ${graphState},
 graphFilter: ${graphFilter},
 isLoading: ${isLoading},
+selectedTransaction: ${selectedTransaction},
 selectedDate: ${selectedDate},
 selectedTransactionType: ${selectedTransactionType},
 transactions: ${transactions},

@@ -24,6 +24,9 @@ abstract class TransactionStoreBase with Store {
   bool isLoading = false;
 
   @observable
+  TransactionModel? selectedTransaction;
+
+  @observable
   DateTime? selectedDate;
 
   @observable
@@ -94,6 +97,39 @@ abstract class TransactionStoreBase with Store {
 
     if (success) {
       getTransactions();
+    }
+
+    isLoading = false;
+
+    return success;
+  }
+
+  @action
+  Future<bool> editTransaction(Map<String, dynamic> req) async {
+    isLoading = true;
+
+    final bool success =
+        await ApiCaller.editTransaction(req, selectedTransaction!.id);
+
+    if (success) {
+      getTransactions();
+    }
+
+    isLoading = false;
+
+    return success;
+  }
+
+  @action
+  Future<bool> deleteTransaction(String id) async {
+    isLoading = true;
+
+    final bool success = await ApiCaller.deleteTransaction(id);
+
+    if (success) {
+      transactions.removeWhere(
+        (t) => t.id == id,
+      );
     }
 
     isLoading = false;

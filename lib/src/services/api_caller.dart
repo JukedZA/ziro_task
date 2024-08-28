@@ -158,6 +158,10 @@ class ApiCaller {
         return null;
       }
 
+      if (list.first['password'] != password) {
+        return null;
+      }
+
       return UserModel.fromJson(list.first);
     } catch (e) {
       debugPrint('GET USER ERROR: ${e.toString()}');

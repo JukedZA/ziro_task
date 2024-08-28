@@ -74,6 +74,9 @@ class _CreateTransactionBodyState extends State<CreateTransactionBody> {
 
     _store = widget.store;
 
+    _store.selectedTransactionType = null;
+    _store.selectedDate = null;
+
     _selectedTransaction = _store.selectedTransaction;
 
     if (_selectedTransaction != null) {
@@ -150,6 +153,7 @@ class _CreateTransactionBodyState extends State<CreateTransactionBody> {
                   focusNode: _amountNode,
                   controller: _amountController,
                   hint: 'Amount',
+                  keyboardType: TextInputType.number,
                   onSaved: (String? value) {},
                   fontSize: 14,
                 ),

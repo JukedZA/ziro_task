@@ -65,6 +65,7 @@ class _LoginBodyState extends State<LoginBody> {
             MyFormField(
               controller: _emailController,
               hint: 'Email',
+              keyboardType: TextInputType.emailAddress,
               onSaved: (String? value) {},
               leadingIcon: const Icon(IconlyBold.message),
             ),
